@@ -34,9 +34,23 @@ class Dataset(BaseModel):
     provider: str
     data_type: Literal["raster", "vector", "climate"]
 
-    spatial_resolution_m: float | None = None
+    spatial_resolutions_m: list[float] = Field(default_factory=list)
     temporal_resolution: str | None = None
 
+    coverage: str | None = None
+    access_method: str | None = None
+
     bands: list[DatasetBand] = Field(default_factory=list)
+
+    typical_use_cases: list[str] = Field(default_factory=list)
+    recommended_scales: list[
+        Literal[
+            "local",
+            "city",
+            "regional",
+            "continental",
+            "global",
+        ]
+    ] = Field(default_factory=list)
 
     description: str
