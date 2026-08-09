@@ -68,6 +68,10 @@ class PreprocessingStep(BaseModel):
         "TEMPORAL_COMPOSITE",
         "NODATA_MASK",
         "SPECKLE_FILTER",
+        "ORBIT_CORRECTION",
+        "THERMAL_NOISE_REMOVAL",
+        "RADIOMETRIC_CALIBRATION",
+        "TERRAIN_CORRECTION",
     ]
 
     description: str
@@ -81,7 +85,16 @@ class PreprocessingPipeline(BaseModel):
     """Defines an ordered preprocessing workflow."""
 
     dataset: str
+
+    data_family: Literal[
+        "OPTICAL",
+        "SAR",
+        "CLIMATE",
+        "PRECIPITATION",
+    ]
+
     steps: list[PreprocessingStep]
+
     rationale: str
 
 class Dataset(BaseModel):
