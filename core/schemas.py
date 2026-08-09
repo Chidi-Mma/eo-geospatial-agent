@@ -27,6 +27,32 @@ class DatasetBand(BaseModel):
     description: str
 
 
+class BandMapping(BaseModel):
+    """Maps a conceptual spectral band to one or more dataset-specific bands."""
+
+    datasets: list[str]
+    conceptual_band: Literal[
+        "BLUE",
+        "GREEN",
+        "RED",
+        "RED_EDGE",
+        "NIR",
+        "SWIR1",
+        "SWIR2",
+        "THERMAL",
+    ]
+    dataset_bands: list[str]
+    description: str | None = None
+
+
+class IndexBandMapping(BaseModel):
+    """Defines the specific dataset bands used to calculate an index."""
+
+    index: str
+    dataset: str
+    band_mapping: dict[str, str]
+    rationale: str
+
 class Dataset(BaseModel):
     """Describes an Earth observation or geospatial dataset."""
 
