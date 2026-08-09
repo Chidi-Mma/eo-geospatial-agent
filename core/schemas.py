@@ -53,6 +53,37 @@ class IndexBandMapping(BaseModel):
     band_mapping: dict[str, str]
     rationale: str
 
+
+class PreprocessingStep(BaseModel):
+    """Defines one approved preprocessing operation."""
+
+    operation: Literal[
+        "SCALE",
+        "CLOUD_MASK",
+        "CLOUD_SHADOW_MASK",
+        "BAND_SELECTION",
+        "RESAMPLE",
+        "REPROJECT",
+        "CLIP",
+        "TEMPORAL_COMPOSITE",
+        "NODATA_MASK",
+        "SPECKLE_FILTER",
+    ]
+
+    description: str
+    required: bool = False
+    parameters: dict[str, str | int | float | bool] = Field(
+        default_factory=dict
+    )
+
+
+class PreprocessingPipeline(BaseModel):
+    """Defines an ordered preprocessing workflow."""
+
+    dataset: str
+    steps: list[PreprocessingStep]
+    rationale: str
+
 class Dataset(BaseModel):
     """Describes an Earth observation or geospatial dataset."""
 
