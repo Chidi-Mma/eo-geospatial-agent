@@ -95,6 +95,92 @@ BAND_MAPPINGS: list[BandMapping] = [
         dataset_bands=["B7"],
         description="Landsat 8/9 Band 7, shortwave infrared.",
     ),
+
+
+        # HLS
+    BandMapping(
+        datasets=["HLS"],
+        conceptual_band="BLUE",
+        dataset_bands=["B02"],
+        description="HLS blue band, harmonized Sentinel-2/Landsat reflectance.",
+    ),
+
+    BandMapping(
+        datasets=["HLS"],
+        conceptual_band="GREEN",
+        dataset_bands=["B03"],
+        description="HLS green band, harmonized Sentinel-2/Landsat reflectance.",
+    ),
+
+    BandMapping(
+        datasets=["HLS"],
+        conceptual_band="RED",
+        dataset_bands=["B04"],
+        description="HLS red band, harmonized Sentinel-2/Landsat reflectance.",
+    ),
+
+    BandMapping(
+        datasets=["HLS"],
+        conceptual_band="NIR",
+        dataset_bands=["B05"],
+        description="HLS near infrared band.",
+    ),
+
+    BandMapping(
+        datasets=["HLS"],
+        conceptual_band="SWIR1",
+        dataset_bands=["B06"],
+        description="HLS shortwave infrared band 1.",
+    ),
+
+    BandMapping(
+        datasets=["HLS"],
+        conceptual_band="SWIR2",
+        dataset_bands=["B07"],
+        description="HLS shortwave infrared band 2.",
+    ),
+
+
+        # Sentinel-1 SAR polarizations
+    BandMapping(
+        datasets=["Sentinel-1"],
+        conceptual_band="VV",
+        dataset_bands=["VV"],
+        description=(
+            "Sentinel-1 C-band SAR VV polarization, "
+            "vertical transmit and vertical receive."
+        ),
+    ),
+
+    BandMapping(
+        datasets=["Sentinel-1"],
+        conceptual_band="VH",
+        dataset_bands=["VH"],
+        description=(
+            "Sentinel-1 C-band SAR VH polarization, "
+            "vertical transmit and horizontal receive."
+        ),
+    ),
+
+    BandMapping(
+        datasets=["Sentinel-1"],
+        conceptual_band="HH",
+        dataset_bands=["HH"],
+        description=(
+            "Sentinel-1 C-band SAR HH polarization, "
+            "horizontal transmit and horizontal receive."
+        ),
+    ),
+
+    BandMapping(
+        datasets=["Sentinel-1"],
+        conceptual_band="HV",
+        dataset_bands=["HV"],
+        description=(
+            "Sentinel-1 C-band SAR HV polarization, "
+            "horizontal transmit and vertical receive."
+        ),
+    ),
 ]
 
 

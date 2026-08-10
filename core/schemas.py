@@ -40,6 +40,10 @@ class BandMapping(BaseModel):
         "SWIR1",
         "SWIR2",
         "THERMAL",
+        "VV",
+        "VH",
+        "HH",
+        "HV",
     ]
     dataset_bands: list[str]
     description: str | None = None
@@ -104,6 +108,13 @@ class Dataset(BaseModel):
     provider: str
     data_type: Literal["raster", "vector", "climate"]
 
+    data_family: Literal[
+    "OPTICAL",
+    "SAR",
+    "CLIMATE",
+    "PRECIPITATION",
+    ]
+
     spatial_resolutions_m: list[float] = Field(default_factory=list)
     temporal_resolution: str | None = None
 
@@ -124,3 +135,54 @@ class Dataset(BaseModel):
     ] = Field(default_factory=list)
 
     description: str
+
+
+class DatasetSelectionRequest(BaseModel):
+    """Structured requirements for selecting an appropriate dataset."""
+
+    analysis_type: str
+    data_family: Literal[
+        "OPTICAL",
+        "SAR",
+        "CLIMATE",
+        "PRECIPITATION",
+    ]
+
+    spatial_scale: Literal[
+        "local",
+        "city",
+        "regional",
+        "continental",
+        "global",
+    ]
+
+    temporal_requirement: str
+
+    required_bands: list[str] = []
+
+    required_variables: list[str] = []
+
+    preferred_resolution_m: int | None = None
+
+    description: str | None = None
+
+
+class Product(BaseModel):
+    """Metadata describing a specific Earth observation or climate product."""
+
+    product_id: str
+    dataset: str
+    provider: str
+
+    description: str
+
+    spatial_resolution_m: int | None = None
+    temporal_resolution: str
+
+    measurements: list[str]
+
+    supported_indices: list[str] = []
+
+    access_method: str
+
+    access_reference: str | None = None

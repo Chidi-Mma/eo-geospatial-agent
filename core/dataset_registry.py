@@ -5,6 +5,7 @@ DATASETS: dict[str, Dataset] = {
 
     "Sentinel-2": Dataset(
         name="Sentinel-2",
+        data_family="OPTICAL",
         provider="Copernicus / European Space Agency",
         data_type="raster",
         spatial_resolutions_m=[10, 20, 60],
@@ -33,6 +34,7 @@ DATASETS: dict[str, Dataset] = {
 
     "Landsat-8/9": Dataset(
         name="Landsat-8/9",
+        data_family="OPTICAL",
         provider="NASA / USGS",
         data_type="raster",
         spatial_resolutions_m=[15, 30, 100],
@@ -61,6 +63,7 @@ DATASETS: dict[str, Dataset] = {
 
     "MODIS": Dataset(
         name="MODIS",
+        data_family="OPTICAL",
         provider="NASA",
         data_type="raster",
         spatial_resolutions_m=[250, 500, 1000],
@@ -87,6 +90,7 @@ DATASETS: dict[str, Dataset] = {
 
     "HLS": Dataset(
         name="HLS",
+        data_family="OPTICAL",
         provider="NASA",
         data_type="raster",
         spatial_resolutions_m=[30],
@@ -112,8 +116,39 @@ DATASETS: dict[str, Dataset] = {
         ),
     ),
 
+
+    "Sentinel-1": Dataset(
+        name="Sentinel-1",
+        provider="Copernicus / European Space Agency",
+        data_type="raster",
+        data_family="SAR",
+        spatial_resolutions_m=[5, 10, 20],
+        temporal_resolution="approximately 6 days with the Sentinel-1 constellation, depending on location and acquisition mode",
+        coverage="Global",
+        access_method="STAC",
+        typical_use_cases=[
+            "flood mapping",
+            "soil moisture analysis",
+            "vegetation structure analysis",
+            "change detection",
+            "wetland monitoring",
+            "cloud-independent Earth observation",
+        ],
+        recommended_scales=[
+            "local",
+            "city",
+            "regional",
+        ],
+        description=(
+            "C-band synthetic aperture radar Earth observation data "
+            "that can acquire imagery regardless of cloud cover or daylight."
+        ),
+    ),
+
+      
     "ERA5": Dataset(
         name="ERA5",
+        data_family="CLIMATE",
         provider="ECMWF / Copernicus Climate Change Service",
         data_type="climate",
         spatial_resolutions_m=[],
@@ -141,8 +176,40 @@ DATASETS: dict[str, Dataset] = {
         ),
     ),
 
+
+    "ERA5-Land": Dataset(
+        name="ERA5-Land",
+        provider="ECMWF / Copernicus Climate Change Service",
+        data_type="climate",
+        data_family="CLIMATE",
+        spatial_resolutions_m=[],
+        temporal_resolution="hourly",
+        coverage="Global",
+        access_method="API",
+        typical_use_cases=[
+            "land-surface temperature analysis",
+            "soil moisture analysis",
+            "evapotranspiration analysis",
+            "drought analysis",
+            "agricultural monitoring",
+            "environmental modelling",
+        ],
+        recommended_scales=[
+            "local",
+            "city",
+            "regional",
+            "continental",
+            "global",
+        ],
+        description=(
+            "High-resolution land-surface reanalysis data providing "
+            "hourly historical estimates of land and hydrological variables."
+        ),
+    ),
+
     "CHIRPS": Dataset(
         name="CHIRPS",
+        data_family="PRECIPITATION",
         provider="Climate Hazards Center, UC Santa Barbara",
         data_type="climate",
         spatial_resolutions_m=[],
