@@ -240,6 +240,126 @@ SENTINEL_1_PIPELINE = PreprocessingPipeline(
 )
 
 
+ERA5_PIPELINE = PreprocessingPipeline(
+    dataset="ERA5",
+    data_family="CLIMATE",
+    steps=[
+        PreprocessingStep(
+            operation="BAND_SELECTION",
+            description="Select the climate variables required for the analysis.",
+            required=True,
+        ),
+        PreprocessingStep(
+            operation="TEMPORAL_COMPOSITE",
+            description=(
+                "Aggregate climate variables over the requested temporal period."
+                "temporal period using a variable-appropriate aggregation method."
+                ),
+        ),
+        PreprocessingStep(
+            operation="REPROJECT",
+            description="Reproject or regrid climate data when required to match the analysis grid.",
+        ),
+        PreprocessingStep(
+            operation="CLIP",
+            description="Subset the climate data to the user's area of interest.",
+            required=True,
+        ),
+        PreprocessingStep(
+            operation="NODATA_MASK",
+            description="Handle missing or invalid climate observations.",
+        ),
+    ],
+    rationale=(
+        "ERA5 preprocessing for climate and environmental analysis. "
+        "Relevant climate variables are selected, temporally aggregated, "
+        "spatially aligned when necessary, clipped to the area of interest, "
+        "and checked for missing values."
+    ),
+)
+
+
+ERA5_LAND_PIPELINE = PreprocessingPipeline(
+    dataset="ERA5-Land",
+    data_family="CLIMATE",
+    steps=[
+        PreprocessingStep(
+            operation="BAND_SELECTION",
+            description="Select the land-surface climate variables required for the analysis.",
+            required=True,
+        ),
+        PreprocessingStep(
+            operation="TEMPORAL_COMPOSITE",
+            description=(
+                "Aggregate the selected climate variable over the requested "
+                "temporal period using a variable-appropriate aggregation method."
+            ),
+        ),
+        PreprocessingStep(
+            operation="REPROJECT",
+            description=(
+                "Reproject or regrid climate data when required to match "
+                "the analysis grid."
+            ),
+        ),
+        PreprocessingStep(
+            operation="CLIP",
+            description="Subset the climate data to the user's area of interest.",
+            required=True,
+        ),
+        PreprocessingStep(
+            operation="NODATA_MASK",
+            description="Handle missing or invalid climate observations.",
+        ),
+    ],
+    rationale=(
+        "ERA5-Land preprocessing for land-surface and environmental analysis. "
+        "Relevant variables are selected, temporally aggregated using a "
+        "variable-appropriate method, spatially aligned when necessary, "
+        "clipped to the area of interest, and checked for missing values."
+    ),
+)
+
+
+CHIRPS_PIPELINE = PreprocessingPipeline(
+    dataset="CHIRPS",
+    data_family="PRECIPITATION",
+    steps=[
+        PreprocessingStep(
+            operation="BAND_SELECTION",
+            description="Select precipitation data for the requested analysis.",
+            required=True,
+        ),
+        PreprocessingStep(
+            operation="TEMPORAL_COMPOSITE",
+            description="Aggregate precipitation over the requested temporal period.",
+            parameters={
+                "method": "sum",
+            },
+        ),
+        PreprocessingStep(
+            operation="REPROJECT",
+            description="Reproject or regrid precipitation data when required to match the analysis grid.",
+        ),
+        PreprocessingStep(
+            operation="CLIP",
+            description="Subset precipitation data to the user's area of interest.",
+            required=True,
+        ),
+        PreprocessingStep(
+            operation="NODATA_MASK",
+            description="Handle missing or invalid precipitation observations.",
+        ),
+    ],
+    rationale=(
+        "CHIRPS preprocessing for precipitation and environmental analysis. "
+        "Precipitation data are selected and temporally aggregated, "
+        "spatially aligned when necessary, clipped to the area of interest, "
+        "and checked for missing values."
+    ),
+)
+
+
 PREPROCESSING_PIPELINES = {
     "Sentinel-2": SENTINEL_2_PIPELINE,
     "Landsat-8": LANDSAT_PIPELINE,
@@ -247,6 +367,9 @@ PREPROCESSING_PIPELINES = {
     "MODIS": MODIS_PIPELINE,
     "HLS": HLS_PIPELINE,
     "Sentinel-1": SENTINEL_1_PIPELINE,
+    "ERA5": ERA5_PIPELINE,
+    "ERA5-Land": ERA5_LAND_PIPELINE,
+    "CHIRPS": CHIRPS_PIPELINE,
 }
 
 def get_preprocessing_pipeline(dataset: str) -> PreprocessingPipeline:
