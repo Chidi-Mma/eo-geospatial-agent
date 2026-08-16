@@ -125,6 +125,8 @@ class Dataset(BaseModel):
 
     bands: list[DatasetBand] = Field(default_factory=list)
 
+    variables: list[str] = Field(default_factory=list)
+
     typical_use_cases: list[str] = Field(default_factory=list)
     recommended_scales: list[
         Literal[
@@ -143,6 +145,7 @@ class DatasetSelectionRequest(BaseModel):
     """Structured requirements for selecting an appropriate dataset."""
 
     analysis_type: str
+
     data_family: Literal[
         "OPTICAL",
         "SAR",
@@ -158,16 +161,21 @@ class DatasetSelectionRequest(BaseModel):
         "global",
     ]
 
-    temporal_requirement: str
+    temporal_requirement: Literal[
+        "daily",
+        "weekly",
+        "monthly",
+        "seasonal",
+        "annual",
+    ]
 
-    required_bands: list[str] = []
+    required_bands: list[str] = Field(default_factory=list)
 
-    required_variables: list[str] = []
+    required_variables: list[str] = Field(default_factory=list)
 
     preferred_resolution_m: int | None = None
 
     description: str | None = None
-
 
 class Product(BaseModel):
     """Metadata describing a specific Earth observation or climate product."""
@@ -237,6 +245,7 @@ class DatasetRanking(BaseModel):
     temporal_score: float
     native_product_score: float
     spectral_score: float
+    variable_score: float
     computational_score: float
 
     total_score: float

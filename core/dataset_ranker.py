@@ -13,14 +13,18 @@ from core.registry import (
     get_sar_analysis,
 )
 from core.dataset_registry import get_dataset
-from core.product_registry import get_product
+from core.product_registry import (
+    get_product,
+    get_products_for_dataset,
+)
 
 
 SPATIAL_WEIGHT = 0.30
 TEMPORAL_WEIGHT = 0.25
-NATIVE_WEIGHT = 0.15
+NATIVE_WEIGHT = 0.10
 SPECTRAL_WEIGHT = 0.15
-COMPUTATIONAL_WEIGHT = 0.15
+VARIABLE_WEIGHT = 0.10
+COMPUTATIONAL_WEIGHT = 0.10
 
 
 def get_analysis_resolution(
@@ -147,14 +151,22 @@ TEMPORAL_REQUIREMENT_DAYS = {
 
 def get_analysis_temporal_resolution(
     candidate: DatasetCandidate,
+    request: DatasetSelectionRequest | None = None,
 ) -> AnalysisTemporalResolution:
     """
-    Determine the temporal resolution for a candidate.
+    Determine the temporal resolution relevant to the requested analysis.
 
-    Use product-level temporal information when a specific
-    product is selected, otherwise use dataset-level information.
+    Use product-level temporal information when a specific product is selected.
+    Otherwise, use dataset-level information.
+
+    For datasets with a single normalized temporal resolution, use the
+    dataset-level value directly.
+
+    For datasets with multiple explicitly supported temporal resolutions,
+    match the resolution to the requested temporal requirement.
     """
 
+    # Product-level temporal resolution
     if candidate.product is not None:
         from core.product_registry import get_product
 
@@ -174,31 +186,71 @@ def get_analysis_temporal_resolution(
 
         return candidate.analysis_temporal_resolution
 
+    # Dataset-level temporal resolution
     dataset = get_dataset(candidate.dataset)
 
-    if (
-        dataset.temporal_resolution_days is None
-        or dataset.temporal_resolution is None
-    ):
+    if dataset.temporal_resolution is None:
         raise ValueError(
             f"No temporal resolution information available "
             f"for dataset {candidate.dataset}."
         )
 
-    candidate.analysis_temporal_resolution = AnalysisTemporalResolution(
-        resolution_days=dataset.temporal_resolution_days,
-        source="dataset",
-        description=dataset.temporal_resolution,
-    )
+    # Datasets with one normalized temporal resolution,
+    # for example ERA5 and ERA5-Land.
+    if dataset.temporal_resolution_days is not None:
+        candidate.analysis_temporal_resolution = AnalysisTemporalResolution(
+            resolution_days=dataset.temporal_resolution_days,
+            source="dataset",
+            description=dataset.temporal_resolution,
+        )
 
-    return candidate.analysis_temporal_resolution
+        return candidate.analysis_temporal_resolution
+
+    # Datasets with multiple explicitly supported temporal resolutions,
+    # for example CHIRPS, which supports daily and monthly data.
+    if request is None:
+        raise ValueError(
+            f"Temporal requirement is required for dataset "
+            f"{candidate.dataset} because it supports multiple "
+            f"temporal resolutions."
+        )
+
+    requested_temporal = request.temporal_requirement.lower()
+
+    supported_temporal = {
+        "daily": 1.0,
+        "weekly": 7.0,
+        "monthly": 30.0,
+        "seasonal": 90.0,
+        "annual": 365.0,
+    }
+
+    dataset_temporal = dataset.temporal_resolution.lower()
+
+    if requested_temporal in supported_temporal:
+        if requested_temporal in dataset_temporal:
+            candidate.analysis_temporal_resolution = (
+                AnalysisTemporalResolution(
+                    resolution_days=supported_temporal[requested_temporal],
+                    source="dataset",
+                    description=dataset.temporal_resolution,
+                )
+            )
+
+            return candidate.analysis_temporal_resolution
+
+    raise ValueError(
+        f"No temporal resolution information available for dataset "
+        f"{candidate.dataset} that matches requested temporal requirement "
+        f"'{request.temporal_requirement}'."
+    )
 
 
 def score_temporal_suitability(
     candidate: DatasetCandidate,
     request: DatasetSelectionRequest,
 ) -> float:
-    """Score how well a candidate's temporal resolution matches the request."""
+    """Score how well the candidate's temporal resolution matches the request."""
 
     target_days = TEMPORAL_REQUIREMENT_DAYS.get(
         request.temporal_requirement.lower()
@@ -207,13 +259,46 @@ def score_temporal_suitability(
     if target_days is None:
         return 0.5
 
-    temporal = get_analysis_temporal_resolution(candidate)
+    temporal = get_analysis_temporal_resolution(
+        candidate,
+        request,
+    )
 
     temporal_days = temporal.resolution_days
 
-    if temporal_days <= target_days:
+    # Exact temporal match
+    if temporal_days == target_days:
         return 1.0
 
+    dataset = get_dataset(candidate.dataset)
+
+    # Datasets with a single normalized temporal resolution,
+    # such as Sentinel-2, Landsat, ERA5, and ERA5-Land,
+    # are fully suitable when their native resolution is finer
+    # than the requested temporal scale.
+    if dataset.temporal_resolution_days is not None:
+        if temporal_days < target_days:
+            return 1.0
+
+    # Product-based datasets with multiple temporal products,
+    # such as CHIRPS, should prefer an exact temporal product
+    # when one exists.
+    if temporal.source == "product" and temporal_days < target_days:
+        from core.product_registry import get_products_for_dataset
+
+        products = get_products_for_dataset(candidate.dataset)
+
+        has_exact_match = any(
+            product.temporal_resolution_days == target_days
+            for product in products
+        )
+
+        if has_exact_match:
+            return 0.7
+
+        return 1.0
+
+    # Candidate is less frequent than requested.
     ratio = target_days / temporal_days
 
     if ratio >= 0.5:
@@ -223,7 +308,6 @@ def score_temporal_suitability(
         return 0.4
 
     return 0.2
-
 
 
 def score_native_product_suitability(
@@ -272,6 +356,11 @@ def score_spectral_suitability(
 
     dataset = get_dataset(candidate.dataset)
 
+    # Spectral suitability is not relevant to climate
+    # or precipitation analyses.
+    if dataset.data_family in {"CLIMATE", "PRECIPITATION"}:
+        return 1.0
+
     if dataset.data_family == "SAR":
         requirements = get_sar_analysis(request.analysis_type)
     else:
@@ -296,6 +385,39 @@ def score_spectral_suitability(
     coverage = available_bands / len(requirements)
 
     if coverage == 1.0:
+        return 1.0
+
+    return 0.0
+
+
+def score_variable_suitability(
+    candidate: DatasetCandidate,
+    request: DatasetSelectionRequest,
+) -> float:
+    """Score whether the dataset provides the variables required by the request."""
+
+    dataset = get_dataset(candidate.dataset)
+
+    # Variable suitability is only relevant to climate
+    # and precipitation datasets.
+    if dataset.data_family not in {"CLIMATE", "PRECIPITATION"}:
+        return 1.0
+
+    # No explicit variables requested, no penalty.
+    if not request.required_variables:
+        return 1.0
+
+    available_variables = {
+        variable.lower()
+        for variable in dataset.variables
+    }
+
+    requested_variables = {
+        variable.lower()
+        for variable in request.required_variables
+    }
+
+    if requested_variables.issubset(available_variables):
         return 1.0
 
     return 0.0
@@ -343,6 +465,11 @@ def rank_dataset_candidate(
         request,
     )
 
+    variable_score = score_variable_suitability(
+        candidate,
+        request,
+    )
+
     temporal_score = score_temporal_suitability(
         candidate,
         request,
@@ -363,21 +490,26 @@ def rank_dataset_candidate(
         request,
     )
 
+
     total_score = (
         spatial_score * SPATIAL_WEIGHT
         + temporal_score * TEMPORAL_WEIGHT
         + native_product_score * NATIVE_WEIGHT
         + spectral_score * SPECTRAL_WEIGHT
+        + variable_score * VARIABLE_WEIGHT
         + computational_score * COMPUTATIONAL_WEIGHT
     )
+
 
     rationale = (
         f"Spatial suitability: {spatial_score:.2f}, "
         f"temporal suitability: {temporal_score:.2f}, "
         f"native product suitability: {native_product_score:.2f}, "
         f"spectral suitability: {spectral_score:.2f}, "
+        f"variable suitability: {variable_score:.2f}, "
         f"computational suitability: {computational_score:.2f}."
     )
+
 
     return DatasetRanking(
         candidate=candidate,
@@ -385,6 +517,7 @@ def rank_dataset_candidate(
         temporal_score=temporal_score,
         native_product_score=native_product_score,
         spectral_score=spectral_score,
+        variable_score=variable_score,
         computational_score=computational_score,
         total_score=total_score,
         rationale=rationale,

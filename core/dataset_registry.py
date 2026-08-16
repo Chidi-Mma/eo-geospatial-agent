@@ -190,6 +190,12 @@ DATASETS: dict[str, Dataset] = {
         temporal_resolution_days=1/24,
         coverage="Global",
         access_method="API",
+        variables=[
+            "temperature",
+            "precipitation",
+            "radiation",
+            "wind",
+        ],
         typical_use_cases=[
             "temperature analysis",
             "precipitation analysis",
@@ -212,67 +218,78 @@ DATASETS: dict[str, Dataset] = {
     ),
 
 
+
     "ERA5-Land": Dataset(
-        name="ERA5-Land",
-        provider="ECMWF / Copernicus Climate Change Service",
-        data_type="climate",
-        data_family="CLIMATE",
-        spatial_resolutions_m=[11100.0],
-        temporal_resolution="hourly",
-        temporal_resolution_days=1/24,
-        coverage="Global",
-        access_method="API",
-        typical_use_cases=[
-            "land-surface temperature analysis",
-            "soil moisture analysis",
-            "evapotranspiration analysis",
-            "drought analysis",
-            "agricultural monitoring",
-            "environmental modelling",
-        ],
-        recommended_scales=[
-            "local",
-            "city",
-            "regional",
-            "continental",
-            "global",
-        ],
-        description=(
-            "High-resolution land-surface reanalysis data providing "
-            "hourly historical estimates of land and hydrological variables."
-        ),
+    name="ERA5-Land",
+    provider="ECMWF / Copernicus Climate Change Service",
+    data_type="climate",
+    data_family="CLIMATE",
+    spatial_resolutions_m=[11100.0],
+    temporal_resolution="hourly",
+    temporal_resolution_days=1/24,
+    coverage="Global",
+    access_method="API",
+    variables=[
+        "temperature",
+        "precipitation",
+        "soil_moisture",
+        "evapotranspiration",
+    ],
+    typical_use_cases=[
+        "land-surface temperature analysis",
+        "soil moisture analysis",
+        "evapotranspiration analysis",
+        "drought analysis",
+        "agricultural monitoring",
+        "environmental modelling",
+    ],
+    recommended_scales=[
+        "local",
+        "city",
+        "regional",
+        "continental",
+        "global",
+    ],
+    description=(
+        "High-resolution land-surface reanalysis data providing "
+        "hourly historical estimates of land and hydrological variables."
     ),
+),
 
-    "CHIRPS": Dataset(
-        name="CHIRPS",
-        data_family="PRECIPITATION",
-        provider="Climate Hazards Center, UC Santa Barbara",
-        data_type="climate",
-        spatial_resolutions_m=[5560.0],
-        temporal_resolution="daily and monthly",
-        temporal_resolution_days=None,
-        coverage="50°S to 50°N",
-        access_method="API",
-        typical_use_cases=[
-            "precipitation monitoring",
-            "drought analysis",
-            "agricultural monitoring",
-            "hydrological analysis",
-            "climate variability analysis",
-        ],
-        recommended_scales=[
-            "local",
-            "city",
-            "regional",
-            "continental",
-        ],
-        description=(
-            "High-resolution rainfall data combining satellite "
-            "observations with in-situ station data."
-        ),
+
+
+"CHIRPS": Dataset(
+    name="CHIRPS",
+    data_family="PRECIPITATION",
+    provider="Climate Hazards Center, UC Santa Barbara",
+    data_type="climate",
+    spatial_resolutions_m=[5560.0],
+    temporal_resolution="daily and monthly",
+    temporal_resolution_days=None,
+    coverage="50°S to 50°N",
+    access_method="API",
+    variables=[
+        "precipitation",
+    ],
+    typical_use_cases=[
+        "precipitation monitoring",
+        "drought analysis",
+        "agricultural monitoring",
+        "hydrological analysis",
+        "climate variability analysis",
+    ],
+    recommended_scales=[
+        "local",
+        "city",
+        "regional",
+        "continental",
+    ],
+    description=(
+        "High-resolution rainfall data combining satellite "
+        "observations with in-situ station data."
     ),
+),
 }
-
 
 def get_dataset(dataset_name: str) -> Dataset:
     """Return a dataset by name."""

@@ -12,11 +12,12 @@ from core.dataset_ranker import (
     score_spatial_resolution,
     score_native_product_suitability,
     score_spectral_suitability,
+    score_variable_suitability,
     score_spatial_resolution,
     score_computational_suitability,
     rank_dataset_candidate,
     rank_dataset_candidates,
-    
+    VARIABLE_WEIGHT,
 )
 
 from core.dataset_ranker import (
@@ -1061,6 +1062,7 @@ def test_rank_dataset_candidate_combines_scores():
         + ranking.temporal_score * TEMPORAL_WEIGHT
         + ranking.native_product_score * NATIVE_WEIGHT
         + ranking.spectral_score * SPECTRAL_WEIGHT
+        + ranking.variable_score * VARIABLE_WEIGHT
         + ranking.computational_score * COMPUTATIONAL_WEIGHT
     )
 
@@ -1160,6 +1162,7 @@ def test_inspect_ndvi_dataset_ranking():
             f" | temporal={ranking.temporal_score:.2f}"
             f" | native={ranking.native_product_score:.2f}"
             f" | spectral={ranking.spectral_score:.2f}"
+            f" | variable={ranking.variable_score:.2f}"
             f" | computational={ranking.computational_score:.2f}"
         )
 
@@ -1209,6 +1212,7 @@ def test_inspect_ndvi_local_daily_ranking():
             f" | temporal={ranking.temporal_score:.2f}"
             f" | native={ranking.native_product_score:.2f}"
             f" | spectral={ranking.spectral_score:.2f}"
+            f" | variable={ranking.variable_score:.2f}"
             f" | computational={ranking.computational_score:.2f}"
         )
 
@@ -1258,6 +1262,7 @@ def test_inspect_ndmi_regional_monthly_ranking():
             f" | temporal={ranking.temporal_score:.2f}"
             f" | native={ranking.native_product_score:.2f}"
             f" | spectral={ranking.spectral_score:.2f}"
+            f" | variable={ranking.variable_score:.2f}"
             f" | computational={ranking.computational_score:.2f}"
         )
 
@@ -1309,3 +1314,97 @@ def test_rank_dataset_candidates_sorts_and_excludes_ineligible():
         ranking.candidate.dataset != "MODIS"
         for ranking in rankings
     )
+
+
+def test_chirps_precipitation_variable_suitability():
+    candidate = DatasetCandidate(
+        dataset="CHIRPS",
+        pathway="calculated",
+    )
+
+    request = DatasetSelectionRequest(
+        analysis_type="precipitation",
+        data_family="PRECIPITATION",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["precipitation"],
+    )
+
+    score = score_variable_suitability(candidate, request)
+
+    assert score == 1.0
+
+
+def test_era5_temperature_variable_suitability():
+    candidate = DatasetCandidate(
+        dataset="ERA5",
+        pathway="calculated",
+    )
+
+    request = DatasetSelectionRequest(
+        analysis_type="temperature",
+        data_family="CLIMATE",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["temperature"],
+    )
+
+    score = score_variable_suitability(candidate, request)
+
+    assert score == 1.0
+
+
+def test_era5_soil_moisture_variable_suitability():
+    candidate = DatasetCandidate(
+        dataset="ERA5",
+        pathway="calculated",
+    )
+
+    request = DatasetSelectionRequest(
+        analysis_type="soil_moisture",
+        data_family="CLIMATE",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["soil_moisture"],
+    )
+
+    score = score_variable_suitability(candidate, request)
+
+    assert score == 0.0
+
+
+def test_era5_land_soil_moisture_variable_suitability():
+    candidate = DatasetCandidate(
+        dataset="ERA5-Land",
+        pathway="calculated",
+    )
+
+    request = DatasetSelectionRequest(
+        analysis_type="soil_moisture",
+        data_family="CLIMATE",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["soil_moisture"],
+    )
+
+    score = score_variable_suitability(candidate, request)
+
+    assert score == 1.0
+
+
+def test_optical_variable_suitability_is_neutral():
+    candidate = DatasetCandidate(
+        dataset="Sentinel-2",
+        pathway="calculated",
+    )
+
+    request = DatasetSelectionRequest(
+        analysis_type="NDVI",
+        data_family="OPTICAL",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+    )
+
+    score = score_variable_suitability(candidate, request)
+
+    assert score == 1.0

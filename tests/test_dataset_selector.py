@@ -1,10 +1,17 @@
 import pytest
 
-from core.schemas import DatasetSelectionRequest
+from core.dataset_ranker import score_variable_suitability
+from core.schemas import (
+    DatasetSelectionRequest,
+    DatasetCandidate,
+)
+
 from core.dataset_selector import (
     get_eligible_products,
+    get_eligible_datasets,
     select_datasets,
     select_best_dataset,
+    
 
 )
 
@@ -204,3 +211,196 @@ def test_select_best_ndvi_regional_dataset():
     assert best.candidate.dataset == "MODIS"
     assert best.candidate.product == "MOD13Q1.061"
     assert best.candidate.pathway == "product"
+
+
+def test_precipitation_regional_candidates():
+    request = DatasetSelectionRequest(
+        analysis_type="precipitation",
+        data_family="PRECIPITATION",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["precipitation"],
+    )
+
+    candidates = get_eligible_products(request)
+
+    candidate_names = {
+        candidate.dataset
+        for candidate in candidates
+    }
+
+    assert "CHIRPS" in candidate_names
+
+
+def test_chirps_supports_precipitation():
+    request = DatasetSelectionRequest(
+        analysis_type="precipitation",
+        data_family="PRECIPITATION",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["precipitation"],
+    )
+
+    candidates = get_eligible_products(request)
+
+    assert all(
+        candidate.dataset == "CHIRPS"
+        for candidate in candidates
+    )
+
+
+
+def test_temperature_regional_climate_candidates():
+    request = DatasetSelectionRequest(
+        analysis_type="temperature",
+        data_family="CLIMATE",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["temperature"],
+    )
+
+    candidates = get_eligible_products(request)
+
+    candidate_names = {
+        candidate.dataset
+        for candidate in candidates
+    }
+
+    assert "ERA5" in candidate_names
+    assert "ERA5-Land" in candidate_names
+
+
+
+def test_soil_moisture_climate_candidates():
+    request = DatasetSelectionRequest(
+        analysis_type="soil_moisture",
+        data_family="CLIMATE",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["soil_moisture"],
+    )
+
+    candidates = get_eligible_products(request)
+
+    candidate_names = {
+        candidate.dataset
+        for candidate in candidates
+    }
+
+    assert "ERA5-Land" in candidate_names
+    assert "ERA5" not in candidate_names
+
+
+
+def test_chirps_precipitation_variable_eligibility():
+    request = DatasetSelectionRequest(
+        analysis_type="precipitation",
+        data_family="PRECIPITATION",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["precipitation"],
+    )
+
+    datasets = get_eligible_datasets(request)
+
+    assert "CHIRPS" in datasets
+
+
+def test_era5_temperature_variable_eligibility():
+    request = DatasetSelectionRequest(
+        analysis_type="temperature",
+        data_family="CLIMATE",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["temperature"],
+    )
+
+    datasets = get_eligible_datasets(request)
+
+    assert "ERA5" in datasets
+
+
+def test_era5_soil_moisture_variable_eligibility():
+    request = DatasetSelectionRequest(
+        analysis_type="soil_moisture",
+        data_family="CLIMATE",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["soil_moisture"],
+    )
+
+    datasets = get_eligible_datasets(request)
+
+    assert "ERA5-Land" in datasets
+    assert "ERA5" not in datasets
+
+
+def test_era5_land_soil_moisture_variable_eligibility():
+    request = DatasetSelectionRequest(
+        analysis_type="soil_moisture",
+        data_family="CLIMATE",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["soil_moisture"],
+    )
+
+    datasets = get_eligible_datasets(request)
+
+    assert "ERA5-Land" in datasets
+
+
+def test_unavailable_variable_makes_dataset_ineligible():
+    request = DatasetSelectionRequest(
+        analysis_type="temperature",
+        data_family="CLIMATE",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["chlorophyll"],
+    )
+
+    datasets = get_eligible_datasets(request)
+
+    assert "ERA5" not in datasets
+    assert "ERA5-Land" not in datasets
+
+
+def test_optical_variable_suitability_is_neutral():
+    candidate = DatasetCandidate(
+        dataset="Sentinel-2",
+        pathway="calculated",
+    )
+
+    request = DatasetSelectionRequest(
+        analysis_type="NDVI",
+        data_family="OPTICAL",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=["temperature"],
+    )
+
+    score = score_variable_suitability(candidate, request)
+
+    assert score == 1.0
+
+
+def test_era5_multiple_variables_eligibility():
+    request = DatasetSelectionRequest(
+        analysis_type="climate",
+        data_family="CLIMATE",
+        spatial_scale="regional",
+        temporal_requirement="monthly",
+        required_variables=[
+            "temperature",
+            "precipitation",
+        ],
+    )
+
+    datasets = get_eligible_datasets(request)
+
+    assert "ERA5" in datasets
+
+
+
+
+
+
