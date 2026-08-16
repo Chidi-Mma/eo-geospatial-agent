@@ -8,6 +8,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Sentinel-2"],
         conceptual_band="BLUE",
         dataset_bands=["B02"],
+        resolution_m=10,
         description="Sentinel-2 Band 2, blue, approximately 490 nm.",
     ),
 
@@ -15,6 +16,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Sentinel-2"],
         conceptual_band="GREEN",
         dataset_bands=["B03"],
+        resolution_m=10,
         description="Sentinel-2 Band 3, green, approximately 560 nm.",
     ),
 
@@ -22,6 +24,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Sentinel-2"],
         conceptual_band="RED",
         dataset_bands=["B04"],
+        resolution_m=10,
         description="Sentinel-2 Band 4, red, approximately 665 nm.",
     ),
 
@@ -29,20 +32,32 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Sentinel-2"],
         conceptual_band="RED_EDGE",
         dataset_bands=["B05", "B06", "B07", "B8A"],
+        resolution_m=20,
         description="Sentinel-2 red-edge and narrow NIR bands.",
     ),
+
+
+    BandMapping(
+    datasets=["Sentinel-2"],
+    conceptual_band="NIR",
+    dataset_bands=["B08"],
+    resolution_m=10,
+    description="Sentinel-2 Band 8, near infrared, 10 m.",
+),
 
     BandMapping(
         datasets=["Sentinel-2"],
         conceptual_band="NIR",
-        dataset_bands=["B08", "B8A"],
-        description="Sentinel-2 near infrared bands.",
+        dataset_bands=["B8A"],
+        resolution_m=20,
+        description="Sentinel-2 8A, narrow near infrared, 20 m.",
     ),
 
     BandMapping(
         datasets=["Sentinel-2"],
         conceptual_band="SWIR1",
         dataset_bands=["B11"],
+        resolution_m=20,
         description="Sentinel-2 Band 11, shortwave infrared.",
     ),
 
@@ -50,6 +65,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Sentinel-2"],
         conceptual_band="SWIR2",
         dataset_bands=["B12"],
+        resolution_m=20,
         description="Sentinel-2 Band 12, shortwave infrared.",
     ),
 
@@ -58,6 +74,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Landsat-8", "Landsat-9"],
         conceptual_band="BLUE",
         dataset_bands=["B2"],
+        resolution_m=30,
         description="Landsat 8/9 Band 2, blue.",
     ),
 
@@ -65,6 +82,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Landsat-8", "Landsat-9"],
         conceptual_band="GREEN",
         dataset_bands=["B3"],
+        resolution_m=30,
         description="Landsat 8/9 Band 3, green.",
     ),
 
@@ -72,6 +90,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Landsat-8", "Landsat-9"],
         conceptual_band="RED",
         dataset_bands=["B4"],
+        resolution_m=30,
         description="Landsat 8/9 Band 4, red.",
     ),
 
@@ -79,6 +98,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Landsat-8", "Landsat-9"],
         conceptual_band="NIR",
         dataset_bands=["B5"],
+        resolution_m=30,
         description="Landsat 8/9 Band 5, near infrared.",
     ),
 
@@ -86,6 +106,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Landsat-8", "Landsat-9"],
         conceptual_band="SWIR1",
         dataset_bands=["B6"],
+        resolution_m=30,
         description="Landsat 8/9 Band 6, shortwave infrared.",
     ),
 
@@ -93,50 +114,64 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Landsat-8", "Landsat-9"],
         conceptual_band="SWIR2",
         dataset_bands=["B7"],
+        resolution_m=30,
         description="Landsat 8/9 Band 7, shortwave infrared.",
     ),
-
 
         # HLS
     BandMapping(
         datasets=["HLS"],
         conceptual_band="BLUE",
-        dataset_bands=["B02"],
+        dataset_bands=["B2"],
+        resolution_m=30,
         description="HLS blue band, harmonized Sentinel-2/Landsat reflectance.",
     ),
 
     BandMapping(
         datasets=["HLS"],
         conceptual_band="GREEN",
-        dataset_bands=["B03"],
+        dataset_bands=["B3"],
+        resolution_m=30,
         description="HLS green band, harmonized Sentinel-2/Landsat reflectance.",
     ),
 
     BandMapping(
         datasets=["HLS"],
         conceptual_band="RED",
-        dataset_bands=["B04"],
+        dataset_bands=["B4"],
+        resolution_m=30,
         description="HLS red band, harmonized Sentinel-2/Landsat reflectance.",
+    ),
+
+BandMapping(
+        datasets=["HLS"],
+        conceptual_band="RED_EDGE",
+        dataset_bands=["B5", "B6", "B7"],
+        resolution_m=30,
+        description="HLS red-edge bands, harmonized Sentinel-2/Landsat reflectance.",
     ),
 
     BandMapping(
         datasets=["HLS"],
         conceptual_band="NIR",
-        dataset_bands=["B05"],
+        dataset_bands=["B8", "B8A"],
+        resolution_m=30,
         description="HLS near infrared band.",
     ),
 
     BandMapping(
         datasets=["HLS"],
         conceptual_band="SWIR1",
-        dataset_bands=["B06"],
+        dataset_bands=["B11"],
+        resolution_m=30,
         description="HLS shortwave infrared band 1.",
     ),
 
     BandMapping(
         datasets=["HLS"],
         conceptual_band="SWIR2",
-        dataset_bands=["B07"],
+        dataset_bands=["B12"],
+        resolution_m=30,
         description="HLS shortwave infrared band 2.",
     ),
 
@@ -146,6 +181,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Sentinel-1"],
         conceptual_band="VV",
         dataset_bands=["VV"],
+        resolution_m=10,
         description=(
             "Sentinel-1 C-band SAR VV polarization, "
             "vertical transmit and vertical receive."
@@ -156,6 +192,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Sentinel-1"],
         conceptual_band="VH",
         dataset_bands=["VH"],
+        resolution_m=10,
         description=(
             "Sentinel-1 C-band SAR VH polarization, "
             "vertical transmit and horizontal receive."
@@ -166,6 +203,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Sentinel-1"],
         conceptual_band="HH",
         dataset_bands=["HH"],
+        resolution_m=10,
         description=(
             "Sentinel-1 C-band SAR HH polarization, "
             "horizontal transmit and horizontal receive."
@@ -176,6 +214,7 @@ BAND_MAPPINGS: list[BandMapping] = [
         datasets=["Sentinel-1"],
         conceptual_band="HV",
         dataset_bands=["HV"],
+        resolution_m=10,
         description=(
             "Sentinel-1 C-band SAR HV polarization, "
             "horizontal transmit and vertical receive."

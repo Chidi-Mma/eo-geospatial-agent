@@ -10,6 +10,7 @@ DATASETS: dict[str, Dataset] = {
         data_type="raster",
         spatial_resolutions_m=[10, 20, 60],
         temporal_resolution="approximately 5 days at the equator",
+        temporal_resolution_days=5,
         coverage="Global",
         access_method="STAC",
         typical_use_cases=[
@@ -32,13 +33,14 @@ DATASETS: dict[str, Dataset] = {
         ),
     ),
 
-    "Landsat-8/9": Dataset(
-        name="Landsat-8/9",
-        data_family="OPTICAL",
+    "Landsat-8": Dataset(
+        name="Landsat-8",
         provider="NASA / USGS",
+        data_family="OPTICAL",
         data_type="raster",
         spatial_resolutions_m=[15, 30, 100],
-        temporal_resolution="16 days per satellite",
+        temporal_resolution="16 days",
+        temporal_resolution_days=16,
         coverage="Global",
         access_method="STAC",
         typical_use_cases=[
@@ -55,12 +57,41 @@ DATASETS: dict[str, Dataset] = {
             "continental",
         ],
         description=(
-            "Multispectral and thermal Earth observation data "
-            "with a long historical record suitable for environmental "
-            "monitoring and change detection."
+            "Landsat 8 multispectral and thermal Earth observation "
+            "data with a long historical record suitable for "
+            "environmental monitoring and change detection."
         ),
     ),
 
+    "Landsat-9": Dataset(
+        name="Landsat-9",
+        data_family="OPTICAL",
+        provider="NASA / USGS",
+        data_type="raster",
+        spatial_resolutions_m=[15, 30, 100],
+        temporal_resolution="16 days",
+        temporal_resolution_days=16,
+        coverage="Global",
+        access_method="STAC",
+        typical_use_cases=[
+            "long-term vegetation monitoring",
+            "land cover mapping",
+            "change detection",
+            "agricultural monitoring",
+            "spectral index calculation",
+        ],
+        recommended_scales=[
+            "local",
+            "city",
+            "regional",
+            "continental",
+        ],
+        description=(
+            "Landsat 9 multispectral and thermal Earth observation "
+            "data suitable for environmental monitoring and "
+            "change detection."
+        ),
+    ),
     "MODIS": Dataset(
         name="MODIS",
         data_family="OPTICAL",
@@ -68,6 +99,7 @@ DATASETS: dict[str, Dataset] = {
         data_type="raster",
         spatial_resolutions_m=[250, 500, 1000],
         temporal_resolution="daily to 16 days, depending on product",
+        temporal_resolution_days=None,
         coverage="Global",
         access_method="STAC",
         typical_use_cases=[
@@ -95,6 +127,7 @@ DATASETS: dict[str, Dataset] = {
         data_type="raster",
         spatial_resolutions_m=[30],
         temporal_resolution="approximately 2 to 3 days globally, depending on location",
+        temporal_resolution_days=2.5,
         coverage="Global",
         access_method="STAC",
         typical_use_cases=[
@@ -124,6 +157,7 @@ DATASETS: dict[str, Dataset] = {
         data_family="SAR",
         spatial_resolutions_m=[5, 10, 20],
         temporal_resolution="approximately 6 days with the Sentinel-1 constellation, depending on location and acquisition mode",
+        temporal_resolution_days=6,
         coverage="Global",
         access_method="STAC",
         typical_use_cases=[
@@ -151,8 +185,9 @@ DATASETS: dict[str, Dataset] = {
         data_family="CLIMATE",
         provider="ECMWF / Copernicus Climate Change Service",
         data_type="climate",
-        spatial_resolutions_m=[],
+        spatial_resolutions_m=[27800.0],
         temporal_resolution="hourly",
+        temporal_resolution_days=1/24,
         coverage="Global",
         access_method="API",
         typical_use_cases=[
@@ -182,8 +217,9 @@ DATASETS: dict[str, Dataset] = {
         provider="ECMWF / Copernicus Climate Change Service",
         data_type="climate",
         data_family="CLIMATE",
-        spatial_resolutions_m=[],
+        spatial_resolutions_m=[11100.0],
         temporal_resolution="hourly",
+        temporal_resolution_days=1/24,
         coverage="Global",
         access_method="API",
         typical_use_cases=[
@@ -212,8 +248,9 @@ DATASETS: dict[str, Dataset] = {
         data_family="PRECIPITATION",
         provider="Climate Hazards Center, UC Santa Barbara",
         data_type="climate",
-        spatial_resolutions_m=[],
+        spatial_resolutions_m=[5560.0],
         temporal_resolution="daily and monthly",
+        temporal_resolution_days=None,
         coverage="50°S to 50°N",
         access_method="API",
         typical_use_cases=[

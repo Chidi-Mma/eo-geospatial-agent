@@ -46,6 +46,7 @@ class BandMapping(BaseModel):
         "HV",
     ]
     dataset_bands: list[str]
+    resolution_m: int
     description: str | None = None
 
 
@@ -117,6 +118,7 @@ class Dataset(BaseModel):
 
     spatial_resolutions_m: list[float] = Field(default_factory=list)
     temporal_resolution: str | None = None
+    temporal_resolution_days: float | None = None
 
     coverage: str | None = None
     access_method: str | None = None
@@ -178,6 +180,7 @@ class Product(BaseModel):
 
     spatial_resolution_m: int | None = None
     temporal_resolution: str
+    temporal_resolution_days: float | None = None
 
     measurements: list[str]
 
@@ -186,3 +189,57 @@ class Product(BaseModel):
     access_method: str
 
     access_reference: str | None = None
+
+
+
+class BandResolution(BaseModel):
+    """Native spatial resolution of a required dataset band."""
+
+    conceptual_band: str
+    dataset_band: str
+    resolution_m: int
+
+    
+class AnalysisResolution(BaseModel):
+    """Spatial resolution and preprocessing requirements for an analysis."""
+
+    resolution_m: int
+    band_resolutions: list[BandResolution]
+    resampling_required: bool = False
+
+
+class AnalysisTemporalResolution(BaseModel):
+    """Temporal characteristics of a dataset or product for an analysis."""
+
+    resolution_days: float
+    source: Literal["dataset", "product"]
+    description: str
+
+
+class DatasetCandidate(BaseModel):
+    """A dataset or product that can satisfy an analysis request."""
+
+    dataset: str
+    product: str | None = None
+    pathway: str
+    eligible: bool = True
+    analysis_resolution: AnalysisResolution | None = None
+    analysis_temporal_resolution: AnalysisTemporalResolution | None = None
+   
+
+
+class DatasetRanking(BaseModel):
+    """Ranking information for an eligible dataset or product."""
+
+    candidate: DatasetCandidate
+
+    spatial_score: float
+    temporal_score: float
+    native_product_score: float
+    spectral_score: float
+    computational_score: float
+
+    total_score: float
+    rationale: str
+
+

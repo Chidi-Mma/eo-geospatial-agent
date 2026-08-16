@@ -185,6 +185,7 @@ SPECTRAL_INDICES: dict[str, SpectralIndex] = {
             "HLS",
         ],
     ),
+
 }
 
 
@@ -206,4 +207,31 @@ def list_indices() -> list[str]:
     """Return the names of all available spectral indices."""
 
     return list(SPECTRAL_INDICES.keys())
+
+
+
+SAR_ANALYSES = {
+    "soil_moisture": [
+        BandRequirement(
+            name="VV",
+            description="Vertical transmit, vertical receive SAR polarization",
+        ),
+        BandRequirement(
+            name="VH",
+            description="Vertical transmit, horizontal receive SAR polarization",
+        ),
+    ],
+}
+
+
+def get_sar_analysis(name: str) -> list[BandRequirement]:
+    key = name.lower()
+
+    if key not in SAR_ANALYSES:
+        raise ValueError(
+            f"Unknown SAR analysis: {name}. "
+            f"Available analyses: {', '.join(SAR_ANALYSES)}"
+        )
+
+    return SAR_ANALYSES[key]
 

@@ -13,6 +13,7 @@ PRODUCTS: dict[str, Product] = {
         ),
         spatial_resolution_m=250,
         temporal_resolution="16-day",
+        temporal_resolution_days=16,
         measurements=[
             "NDVI",
             "EVI",
@@ -27,7 +28,47 @@ PRODUCTS: dict[str, Product] = {
         access_method="Earth Engine",
     ),
 
+
+    "CHIRPS-DAILY": Product(
+        product_id="CHIRPS-DAILY",
+        dataset="CHIRPS",
+        provider="Climate Hazards Center, UC Santa Barbara",
+        description=(
+            "Daily precipitation estimates from the Climate Hazards "
+            "InfraRed Precipitation with Station data dataset."
+        ),
+        spatial_resolution_m=None,
+        temporal_resolution="daily",
+        temporal_resolution_days=1.0,
+        measurements=[
+            "precipitation",
+        ],
+        supported_indices=[],
+        access_method="API",
+    ),
+
+    "CHIRPS-MONTHLY": Product(
+        product_id="CHIRPS-MONTHLY",
+        dataset="CHIRPS",
+        provider="Climate Hazards Center, UC Santa Barbara",
+        description=(
+            "Monthly precipitation estimates from the Climate Hazards "
+            "InfraRed Precipitation with Station data dataset."
+        ),
+        spatial_resolution_m=None,
+        temporal_resolution="monthly",
+        temporal_resolution_days=30.0,
+        measurements=[
+            "precipitation",
+        ],
+        supported_indices=[],
+        access_method="API",
+    ),
+
 }
+
+
+
 
 
 def get_product(product_id: str) -> Product:
