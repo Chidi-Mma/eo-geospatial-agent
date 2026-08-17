@@ -4,24 +4,20 @@ from agent.agent import agent
 
 
 async def main():
-    user_request = (
-        "Which dataset should I use for soil moisture analysis "
-    "at regional scale?"
+    first_result = await agent.run(
+        "Which dataset should I use for NDVI at regional scale?"
     )
 
-    result = await agent.run(
-   user_request
-)
+    print("\nFIRST RESPONSE:")
+    print(first_result.output)
 
-    print("\nUSER REQUEST:")
-    print(user_request)
+    second_result = await agent.run(
+        "What about monthly observations?",
+        message_history=first_result.all_messages(),
+    )
 
-    print("\nAGENT RESPONSE:")
-    print(result.output)
-
-    print("\nMESSAGE TYPES:")
-    for message in result.all_messages():
-        print(type(message).__name__)
+    print("\nSECOND RESPONSE:")
+    print(second_result.output)
 
 
 if __name__ == "__main__":
