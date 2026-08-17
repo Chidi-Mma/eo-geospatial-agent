@@ -5,11 +5,12 @@ from agent.agent import agent
 
 async def main():
     user_request = (
-        "Which dataset should I use for monthly precipitation at regional scale?"
+        "Which dataset should I use for soil moisture analysis "
+    "at regional scale?"
     )
 
     result = await agent.run(
-    "Which dataset should I use for monthly precipitation at regional scale?"
+   user_request
 )
 
     print("\nUSER REQUEST:")
