@@ -1,6 +1,6 @@
 from pydantic_ai import Agent
 from agent.hooks import tool_execution_hooks
-
+from agent.reasoning import adaptive_reasoning_capability
 from agent.model import model
 from core.dataset_selector import select_best_dataset
 from core.schemas import DatasetRanking, DatasetSelectionRequest
@@ -107,7 +107,10 @@ agent = Agent(
         "explicitly asks about the ranking methodology."
     ),
 
-capabilities=[tool_execution_hooks],
+capabilities=[
+    adaptive_reasoning_capability,
+    tool_execution_hooks,
+    ],
 
 )
 
