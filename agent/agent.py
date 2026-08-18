@@ -1,9 +1,8 @@
+from agent.skills.dataset_selection import dataset_selection_skill
 from pydantic_ai import Agent
 from agent.hooks import tool_execution_hooks
 from agent.reasoning import adaptive_reasoning_capability
 from agent.model import model
-from core.dataset_selector import select_best_dataset
-from core.schemas import DatasetRanking, DatasetSelectionRequest
 from agent.model_selection import create_model_selection_capability
 
 
@@ -112,15 +111,12 @@ capabilities=[
     adaptive_reasoning_capability,
     create_model_selection_capability(),
     tool_execution_hooks,
-    ],
+],
+toolsets=[
+    dataset_selection_skill,
+],
+
 
 )
 
 
-@agent.tool_plain
-def select_best_dataset_tool(
-    request: DatasetSelectionRequest,
-) -> DatasetRanking | None:
-    """Select the highest-ranked dataset or product for an analysis request."""
-
-    return select_best_dataset(request)
