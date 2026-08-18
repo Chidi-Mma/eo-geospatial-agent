@@ -1,4 +1,4 @@
-from agent.skills.dataset_selection import dataset_selection_skill
+from agent.skills.loader import dynamic_skill_toolset
 from pydantic_ai import Agent
 from agent.hooks import tool_execution_hooks
 from agent.reasoning import adaptive_reasoning_capability
@@ -113,7 +113,7 @@ capabilities=[
     tool_execution_hooks,
 ],
 toolsets=[
-    dataset_selection_skill,
+    dynamic_skill_toolset,
 ],
 
 
